@@ -40,17 +40,26 @@ class FaaSAPI(object):
         return self.access_token
     
     def get_investigations(self):
+        """ pulls a list of investigations, returns a dict - or false if there was an error
+
+        """
         headers = { 'Authorization' : "Bearer {}".format(self.accesstoken())}
         try:
             req = requests.get("https://api.services.fireeye.com/investigations", headers=headers, proxies=self.proxy)
+            if req.status_code == 200:
+                if 'data' in req.json().keys():
+                    if 'objects' in req.json()['data'].keys():
+                        return req.json()['data']['objects']
         except Error as e:
             sys.exit("Error doing get_investigations: {}".format(e))
-        if 'data' in req.json().keys():
-            if 'objects' in req.json()['data'].keys():
-                return req.json()['data']['objects']
+        
         return False
 
     def get_investigation(self, investigationId : str):
+        """ pulls a STIX object representing a particular investigation. 
+        
+            returns a dict object
+            """
         headers = { 'Authorization' : "Bearer {}".format(self.accesstoken())}
         try:
             req = requests.get("https://api.services.fireeye.com/investigations/{}".format(investigationId), headers=headers, proxies=self.proxy)

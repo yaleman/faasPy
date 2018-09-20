@@ -5,7 +5,13 @@ import base64
 import requests
 
 class FaaSAPI(object):
-    def __init__(self, apikey, apipassword, proxy):
+    def __init__(self, apikey : str, apipassword : str, proxy):
+        """ Implements a simple interface for the FireEye as a Service Investigations API 
+        faas = FasSAPI(apikey, apipassword, proxy)
+        
+        * apikey and apipassword are provided by your FireEye contact.
+        * proxy is used by the python requests module to connect via an explicit proxy (http://docs.python-requests.org/en/master/user/advanced/#proxies)
+        """
         authbytes = "{}:{}".format(apikey, apipassword).encode('utf-8')
         self.authtoken = base64.encodebytes(authbytes).decode('utf-8').replace("\n", "")
         self.proxy = proxy
@@ -44,7 +50,7 @@ class FaaSAPI(object):
                 return req.json()['data']['objects']
         return False
 
-    def get_investigation(self, investigationId):
+    def get_investigation(self, investigationId : str):
         headers = { 'Authorization' : "Bearer {}".format(self.accesstoken())}
         try:
             req = requests.get("https://api.services.fireeye.com/investigations/{}".format(investigationId), headers=headers, proxies=self.proxy)
